@@ -2,7 +2,6 @@ var $ = require('jquery');
 var Firebase = require('firebase');
 
 
-
 $.fn.serializeObject = function(){
   return this.serializeArray().reduce(function(acum, i){
     acum[i.name] = i.value;
@@ -13,21 +12,19 @@ $.fn.serializeObject = function(){
 $(function(){
   var ref = new Firebase("https://vivid-heat-4434.firebaseio.com");
   var auth;
+  var name;
 
   $('#messageInput').keypress(function (e) {
     if (e.keyCode == 13) {
-      // var name = $('#nameInput').val();
       var text = $('#messageInput').val();
-      myDataRef.push({name: name, text: text, auth: auth});
+      ref.push({name: name, text: text, auth: auth});
       $('#messageInput').val('');
     }
   });
-​
-  myDataRef.on('child_added', function(snapshot) {
+  ref.on('child_added', function(snapshot) {
     var message = snapshot.val();
     displayChatMessage(message.name, message.text);
   });
-​
   function displayChatMessage(name, text) {
     $('<div/>').text(text).prepend($('<em/>').text(name+': ')).appendTo($('#messagesDiv'));
     $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
@@ -37,8 +34,8 @@ $(function(){
     event.preventDefault();
     var $form = $(this);
     var formData = $form.serializeObject();
-    // $.post('https://vivid-heat-4434.firebaseio.com');
-    ref.creatUser(formData, function(error, userData){
+
+    ref.createUser(formData, function(error, userData){
       if (error) {
         switch (error.code) {
           case "EMAIL_TAKEN":
@@ -67,7 +64,7 @@ $(function(){
       } else {
         console.log("Authenticated successfully with payload:", authData);
         auth = authData.token;
-        name= $('#username').val();
+        name = $('#username').val();
         $('#login').addClass('hidden');
         $('#signup').addClass('hidden');
         $('.chat-container').removeClass('hidden');
